@@ -32,4 +32,19 @@ def get_contact(contact_id):
         return jsonify(contact.serialize()), 200
     else:
         return jsonify({'message': 'Contact not found'}), 404
-contacts = []
+#contacts = []
+
+@app.route('/contacts', methods=['POST'])
+def post_contact(data):
+    if not data:
+        return jsonify({'message': 'No input data provided'}), 400
+    if not all(key in data for key in ('name', 'email', 'phone')):
+        return jsonify({'message': 'Missing fields in input data'}), 400
+    new_contact = Contact(
+        name=data['name'],
+        email=data['email'],
+        phone=data['phone']
+    )
+    db.session.add(new_contact)
+    db.session.commit()
+    return jsonify(new_contact.serialize()), 201
